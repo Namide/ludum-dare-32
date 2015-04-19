@@ -37,7 +37,7 @@ class Entity
 	
 	public function upd( t:Float )
 	{
-		if ( !body.isSleeping )
+		if ( body != null && !body.isSleeping )
 		{
 			display.x = body.position.x;
 			display.y = body.position.y;

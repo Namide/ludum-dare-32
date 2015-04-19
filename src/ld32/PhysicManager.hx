@@ -1,4 +1,5 @@
 package ld32;
+import haxe.ds.ObjectMap;
 import nape.callbacks.CbEvent;
 import nape.callbacks.CbType;
 import nape.callbacks.InteractionCallback;
@@ -30,11 +31,15 @@ class PhysicManager
 	public var currentGravity:Vec2;
 	public var space:Space;
 	
+	var _objectiveState:Int;
+	
 	//var _bil:InteractionListener;
 	//var _eil:InteractionListener;
 	
 	var _w:Int;
 	var _h:Int;
+	
+	var levelClass:Class<LevelUI>;
 	
 	function new() 
 	{
@@ -134,8 +139,10 @@ class PhysicManager
 		b.handleEndContact(interactionCallback);
 	}*/
 	
-	public function init( level:Level1 )
+	public function init( Level:Class<LevelUI> )
 	{
+		var level:LevelUI = Type.createInstance( Level, [] );
+		
 		_w = Math.round(level.wallsUI.width);
 		_h = Math.round(level.wallsUI.height);
 		
@@ -143,6 +150,7 @@ class PhysicManager
 		
 		EntityManager.i().clearEntities();
 		
+		initGoal( level );
 		initWorld( level );
 		initItems( level );
 		
@@ -154,9 +162,37 @@ class PhysicManager
 		ball.space = SPACE;*/
 		
 		changeG( gravityBottom );
+		
+		DisplayManager.i().addLevel(level);
 	}
 	
-	function initItems( level:Level1 )
+	function initGoal( level:LevelUI )
+	{
+		var msg = level.textUI;
+		msg.gotoAndStop( 1 );
+		msg.scaleX = msg.scaleY = 0.5;
+		msg.alpha = 0;
+		msg.x = msg.y = 0;
+		DisplayManager.i().addChild( msg );
+		
+		_objectiveState = 0;
+		var t = motion.Actuate.tween( msg, 0.5, { scaleX:1, scaleY:1, alpha:1 } ).ease (motion.easing.Sine.easeOut).delay( 0.1 );
+		motion.Actuate.tween( msg, 0.5, { scaleX:0.5, scaleY:0.5, alpha:0 }, false )
+					.ease(motion.easing.Sine.easeOut).delay( 2 )
+					.onComplete( function() { if ( msg != null && msg.parent != null ) msg.parent.removeChild(msg); ObjectiveManager.i().validObjective(level); } );
+		
+		/*if ( Std.is( level, Level1 ) )
+		{
+			motion.Actuate.tween( msg, 1, { scaleX:0.5, scaleY:0.5, alpha:0 }, false )
+					.ease(motion.easing.Sine.easeOut).delay( 3 )
+					.onComplete( function() { if ( msg != null && msg.parent != null ) msg.parent.removeChild(msg); } );
+		}*/
+		
+	}
+	
+	
+	
+	function initItems( level:LevelUI )
 	{
 		
 		var i = level.itemsUI.numChildren;
@@ -172,6 +208,8 @@ class PhysicManager
 				EntityManager.i().add( new Spikes( s ) );
 			else if ( Std.is( s, SpawnUI ) )
 				EntityManager.i().playerStart(s.x, s.y);
+			else if ( Std.is( s, End64UI ) )
+				EntityManager.i().add( new End( s ) );
 		}
 		
 		// BOX 1
@@ -197,7 +235,7 @@ class PhysicManager
 		
 	}
 	
-	function initWorld( level:Level1 )
+	function initWorld( level:LevelUI )
 	{
 		var hw = _w * 0.5;
 		var hh = _h * 0.5;

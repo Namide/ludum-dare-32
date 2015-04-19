@@ -31,9 +31,9 @@ class Game extends Sprite
 		
 		main = this;
 		
-		var level = new Level1();
-		PhysicManager.i().init( level );
-		DisplayManager.i().addLevel(level);
+		//var level = new Level0();
+		PhysicManager.i().init( Level0 );
+		//DisplayManager.i().addLevel(level);
 		
 		// SIZE
 		var w = 800;

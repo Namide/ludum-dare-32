@@ -31,7 +31,10 @@ class EntityManager
 	public function add(e:Entity)
 	{
 		entities.push(e);
-		e.body.space = PhysicManager.i().space;
+		
+		if ( e.body != null )
+			e.body.space = PhysicManager.i().space;
+		
 		DisplayManager.i().addChild( e.display );
 	}
 	

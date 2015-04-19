@@ -19,7 +19,8 @@ class Player extends Entity
 {
 	//public var body:Body;
 	public var controller:Keyboard;
-	public var napeDatas:NapeDatas;
+	//public var napeDatas:NapeDatas;
+	public var playable:Bool;
 	
 	var _mat:Material;
 	var _anim:PlayerUI;
@@ -35,6 +36,8 @@ class Player extends Entity
 	{
 		super();
 		
+		//playable = false;
+		
 		var shape = new Polygon(Polygon.rect( -24, -32, 48, 64));
 		_mat = shape.material;
 		_mat.staticFriction = 0;
@@ -48,8 +51,8 @@ class Player extends Entity
 		body.allowRotation = false;
 		body.userData.name = "player";
 		body.userData.display = this;
-		napeDatas = new NapeDatas();
-		body.userData.napeDatas = napeDatas;
+		//napeDatas = new NapeDatas();
+		//body.userData.napeDatas = napeDatas;
 		
 		display = _anim = new PlayerUI();
 		
@@ -59,6 +62,8 @@ class Player extends Entity
 		
 		controller.addKeyListener( Keys.keyBottom, null, changeDir );
 		controller.addKeyListener( Keys.keyB1, null, moveToDir );
+		
+		pause();
 	}
 	
 	function changeDir()
@@ -85,8 +90,30 @@ class Player extends Entity
 		motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation:0 } ).ease (motion.easing.Elastic.easeOut);
 	}
 	
+	override public function dispose() 
+	{
+		super.dispose();
+		pause();
+	}
+	
+	function pause()
+	{
+		playable = false;
+		
+		_anim.scaleX = 1;
+		_anim.arrowScaleUI.scaleX = 1;
+		
+		_currentAnim = "pause";
+		_anim.gotoAndStop( _currentAnim );
+	}
+	
 	public override function upd( t:Float )
 	{
+		super.upd( t );
+		
+		if ( !playable )
+			return;
+		
 		var contacts = Entity.getContacts( body );
 		var axisX = controller.getAxisX();
 		var axisY = controller.getAxisY();
@@ -182,9 +209,6 @@ class Player extends Entity
 			_currentAnim = nextAnim;
 			_anim.gotoAndStop( nextAnim );
 		}
-		
-		
-		super.upd( t );
 	}
 	
 	public function updY( v:Float )

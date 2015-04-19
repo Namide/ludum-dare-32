@@ -17,12 +17,12 @@ class DisplayManager extends Sprite
 		
 	}
 	
-	public function addLevel( level:Level1 )
+	public function addLevel( level:LevelUI )
 	{
-		
 		var graphic = level.graphicUI;
 		graphic.x = -level.wallsUI.width * 0.5;
 		graphic.y = -level.wallsUI.height * 0.5;
+		graphic.cacheAsBitmap = true;
 		addChild( graphic );
 	}
 	
