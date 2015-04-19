@@ -1,6 +1,8 @@
 package ld32;
 
 import flash.display.Sprite;
+import flash.events.MouseEvent;
+import flash.Lib;
 import haxe.Timer;
 import nape.callbacks.CbEvent;
 import nape.callbacks.CbType;
@@ -41,12 +43,20 @@ class PhysicManager
 	var _w:Int;
 	var _h:Int;
 	
+	var _startTime:Float;
+	
 	function new() 
 	{
 		currentLevel = -1;
-		levelList = [ Level0, Level1, Level2, Level3, Level4 ];
+		levelList = [ Level0, Level1, Level2, Level3, Level4, Level5 ];
 		space = new Space();
 	}
+	
+	/*public function reboot()
+	{
+		//trace("restart");
+		start(0);
+	}*/
 	
 	public function restart()
 	{
@@ -103,10 +113,14 @@ class PhysicManager
 	
 	public function start( numLevel:Int )
 	{
+		if ( numLevel >= levelList.length )
+			numLevel = 0;
+		
 		EntityManager.i().clearEntities();
 		ObjectiveManager.i().restart();
 	
-		
+		if ( numLevel < 1 )
+			_startTime = haxe.Timer.stamp();
 		
 		currentLevel = numLevel;
 		var level:LevelUI = Type.createInstance( levelList[numLevel], [] );
@@ -183,14 +197,27 @@ class PhysicManager
 		}
 		else
 		{
-			d = new GOUI();
-			Timer.delay( function() { start( 0 ); }, Math.round(t * 1000) );
+			var go = new GOUI();
+			d = go;
+			var dt = haxe.Timer.stamp() - _startTime;
+			go.timeT.text += Std.string(Math.round( dt * 100 ) / 100) + " sec";
+			
+			currentLevel = 0;
+			/*d = new GOUI();*/
+			Lib.current.stage.addEventListener( MouseEvent.CLICK, clickRestart );
+			//Timer.delay( function() { start( 0 ); }, Math.round(t * 1000) );
 		}
 		
 		ObjectiveManager.i().onComplete = null;
 		DisplayManager.i().layer.addChild( d );
 		ObjectiveManager.i().animSprite( d );
 		
+	}
+	
+	function clickRestart(e:Dynamic)
+	{
+		Lib.current.stage.removeEventListener( MouseEvent.CLICK, clickRestart );
+		start( 0 );
 	}
 	
 	function initItems( level:LevelUI )
@@ -212,6 +239,7 @@ class PhysicManager
 			}
 			else if ( 	Std.is( s, Spikeball32UI ) ||
 						Std.is( s, Spikeball64UI ) ||
+						Std.is( s, Spikeball128UI ) ||
 						Std.is( s, Spikeball32SpeedUI ) )
 			{
 				var sp = new Spikes( s );
@@ -265,14 +293,26 @@ class PhysicManager
 	
 	public function upd(t:Float)
 	{
+		if ( !EntityManager.i().player.isPlayable )
+			return;
+		
 		PhysicManager.i().space.step( t );
+		
+		if ( 	EntityManager.i().player.display.x < -Main.W * 0.5 ||
+				EntityManager.i().player.display.x > Main.W * 0.5 ||
+				EntityManager.i().player.display.y < -Main.H * 0.5 ||
+				EntityManager.i().player.display.y > Main.H * 0.5   )
+		{
+			restart();
+		}
 		
 		if ( _enemies != null )
 		{
 			var p = EntityManager.i().player;
 			for ( e in _enemies )
 			{
-				if ( e.body.angularVel * e.angularVel < 0 )
+				if ( 	e.body.angularVel * e.angularVel < 0 ||
+						e.body.velocity.length == 0 )
 				{
 					e.angularVel *= -1;
 				}

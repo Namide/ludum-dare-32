@@ -17,9 +17,9 @@ class Spikes extends Entity
 	{
 		super();
 		
-		var s = 32;
+		var s = 32.0;
 		var dir = (Math.random()>0.5) ? 1 : -1;
-		var v = 4;
+		var v = 4.0;
 		
 		if ( Std.is( ui, Spikeball32UI ) )
 		{
@@ -28,6 +28,11 @@ class Spikes extends Entity
 		else if ( Std.is( ui, Spikeball64UI ) )
 		{
 			s = 64;
+		}
+		else if ( Std.is( ui, Spikeball128UI ) )
+		{
+			s = 128;
+			v *= 1.5;
 		}
 		else if ( Std.is( ui, Spikeball32SpeedUI ) )
 		{

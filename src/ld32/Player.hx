@@ -62,7 +62,6 @@ class Player extends Entity
 		
 		r = 32;
 		
-		
 		body = new Body( BodyType.DYNAMIC );
 		body.shapes.add( shape );
 		body.position.setxy(-50, 0);
@@ -72,11 +71,10 @@ class Player extends Entity
 		//body.userData.display = this;
 		//napeDatas = new NapeDatas();
 		//body.userData.napeDatas = napeDatas;
+		body.isBullet = true;
 		
 		display = _anim = new PlayerUI();
-		
 		controller = new Keyboard( 0.08 );
-		
 		dir = PhysicManager.gravityBottom;
 		
 		controller.addKeyListener( Keys.keyBottom, null, changeDir );
@@ -99,9 +97,10 @@ class Player extends Entity
 		if ( onChangeG != null )
 			onChangeG();
 		
-		//var angle = _anim.rotation - ( (dir.angle - PhysicManager.i().currentGravity.angle) - Entity.HALF_PI) * Entity.RAD_TO_DEGREES;
 		var angle = (PhysicManager.i().currentGravity.angle - dir.angle) * Entity.RAD_TO_DEGREES;
-		motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation: PhysicManager.modRotDegrees( _anim.arrowScaleUI.arrowRotUI.rotation, angle ) } ).ease(motion.easing.Elastic.easeOut);
+		
+		if ( _anim != null && _anim.arrowScaleUI != null && _anim.arrowScaleUI.arrowRotUI != null )
+			motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation: PhysicManager.modRotDegrees( _anim.arrowScaleUI.arrowRotUI.rotation, angle ) } ).ease(motion.easing.Elastic.easeOut);
 	}
 	
 	function moveToDir()
@@ -114,7 +113,8 @@ class Player extends Entity
 				onAppliG();
 		}
 		
-		motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation:0 } ).ease (motion.easing.Elastic.easeOut);
+		if ( _anim != null && _anim.arrowScaleUI != null && _anim.arrowScaleUI.arrowRotUI != null )
+			motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation:0 } ).ease (motion.easing.Elastic.easeOut);
 	}
 	
 	override public function dispose() 
@@ -161,20 +161,31 @@ class Player extends Entity
 		
 		
 		// DEAD!
-		if ( contacts.top && contacts.bottom )
+		if ( body.crushFactor() > 10000 )
 		{
 			if ( onDead != null )
 				onDead();
 			return;
-			//trace("ecrasé");
+			//trace( body.crushFactor() );
+		}
+		/*if ( body.crushFactor() > 0 )
+		{
+			if ( onDead != null )
+				onDead();
+			return;
+		}*/
+		/*if ( contacts.top && contacts.bottom )
+		{
+			if ( onDead != null )
+				onDead();
+			return;
 		}
 		else if ( contacts.left && contacts.right )
 		{
 			if ( onDead != null )
 				onDead();
 			return;
-			//trace("pressé");
-		}
+		}*/
 		
 		
 		// CONTROLS
@@ -184,7 +195,7 @@ class Player extends Entity
 			
 			if ( axisX == 0 )
 			{
-				_mat.dynamicFriction = 0; //Take away friction so he can accelerate.
+				_mat.dynamicFriction = 0;
 				_mat.staticFriction = 0;
 			}
 			else

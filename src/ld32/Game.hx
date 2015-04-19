@@ -77,7 +77,12 @@ class Game extends Sprite
 		
 		
 		// Bug if this listener is in PhysicManager ???
-		flash.Lib.current.stage.addEventListener( flash.events.KeyboardEvent.KEY_UP, function(e:flash.events.KeyboardEvent) { if ( e.keyCode == 8 ) PhysicManager.i().restart(); } );
+		flash.Lib.current.stage.addEventListener( flash.events.KeyboardEvent.KEY_UP, function(e:flash.events.KeyboardEvent) {
+			if ( e.keyCode == 8 )
+				PhysicManager.i().restart();
+			if ( e.keyCode == 27 )
+				PhysicManager.i().start(0);
+		} );
 	}
 	
 	/*public function changeG()

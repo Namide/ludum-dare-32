@@ -19,6 +19,7 @@ class DisplayManager extends Sprite
 	
 	public var world:Sprite;
 	public var layer:Sprite;
+	public var overlay:Sprite;
 	
 	#if debug
 		public var debug:Sprite;
@@ -39,8 +40,10 @@ class DisplayManager extends Sprite
 		this.h = h;
 		world = new Sprite();
 		layer = new Sprite();
+		overlay = new OverlayUI();
 		addChild( world );
 		addChild( layer );
+		addChild( overlay );
 		
 		#if debug
 			debug = new Sprite();
