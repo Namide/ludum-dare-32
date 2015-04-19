@@ -1,4 +1,5 @@
 package ld32;
+import flash.display.MovieClip;
 
 /**
  * ...
@@ -11,6 +12,7 @@ class EntityManager
 	
 	public var player:Player;
 	public var entities:Array<Entity>;
+	public var message:MovieClip;
 	
 	function new() 
 	{
@@ -23,19 +25,19 @@ class EntityManager
 		
 		//remove( player );
 		player.body.position.setxy( x, y );
-		DisplayManager.i().addChild( player.display );
+		DisplayManager.i().world.addChild( player.display );
 		player.body.space = PhysicManager.i().space;
 		add( player );
 	}
 	
-	public function add(e:Entity)
+	public function add(e:Entity, over:Bool = false)
 	{
 		entities.push(e);
 		
 		if ( e.body != null )
 			e.body.space = PhysicManager.i().space;
 		
-		DisplayManager.i().addChild( e.display );
+		DisplayManager.i().world.addChildAt( e.display, (over)?DisplayManager.i().world.numChildren:0 );
 	}
 	
 	public function remove(e:Entity)
@@ -53,9 +55,21 @@ class EntityManager
 	
 	public function clearEntities()
 	{
+		message = null;
+		
 		for ( e in entities )
 			e.dispose();
 		
+		var dm = DisplayManager.i();
+			
+		while ( dm.world.numChildren > 0 )
+			dm.world.removeChildAt( 0 );
+		
+		while ( dm.layer.numChildren > 0 )
+			dm.layer.removeChildAt( 0 );
+		
+		PhysicManager.i().space.clear();
+	
 		entities = [];
 	}
 	

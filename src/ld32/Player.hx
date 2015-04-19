@@ -20,7 +20,8 @@ class Player extends Entity
 	//public var body:Body;
 	public var controller:Keyboard;
 	//public var napeDatas:NapeDatas;
-	public var playable:Bool;
+	public var isPlayable:Bool;
+	public var isDead:Bool;
 	
 	var _mat:Material;
 	var _anim:PlayerUI;
@@ -31,6 +32,21 @@ class Player extends Entity
 	public var velXJump = 300;
 	
 	public var dir:Vec2;
+	
+	public var onMove:Void->Void;
+	public var onDead:Void->Void;
+	public var onJump:Void->Void;
+	public var onChangeG:Void->Void;
+	public var onAppliG:Void->Void;
+	
+	public function removeListener()
+	{
+		onMove = 
+		onDead =
+		onJump =
+		onChangeG = 
+		onAppliG = null;
+	}
 	
 	public function new() 
 	{
@@ -44,13 +60,16 @@ class Player extends Entity
 		_mat.elasticity = 0;
 		_mat.density = 0.01;
 		
+		r = 32;
+		
+		
 		body = new Body( BodyType.DYNAMIC );
 		body.shapes.add( shape );
 		body.position.setxy(-50, 0);
 		//body.space = space;
 		body.allowRotation = false;
 		body.userData.name = "player";
-		body.userData.display = this;
+		//body.userData.display = this;
 		//napeDatas = new NapeDatas();
 		//body.userData.napeDatas = napeDatas;
 		
@@ -77,6 +96,9 @@ class Player extends Entity
 		else
 			dir = PhysicManager.gravityBottom;
 		
+		if ( onChangeG != null )
+			onChangeG();
+		
 		//var angle = _anim.rotation - ( (dir.angle - PhysicManager.i().currentGravity.angle) - Entity.HALF_PI) * Entity.RAD_TO_DEGREES;
 		var angle = (PhysicManager.i().currentGravity.angle - dir.angle) * Entity.RAD_TO_DEGREES;
 		motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation: PhysicManager.modRotDegrees( _anim.arrowScaleUI.arrowRotUI.rotation, angle ) } ).ease(motion.easing.Elastic.easeOut);
@@ -85,23 +107,39 @@ class Player extends Entity
 	function moveToDir()
 	{
 		if ( dir != PhysicManager.i().currentGravity )
+		{
 			PhysicManager.i().changeG( dir );
+			
+			if ( onAppliG != null )
+				onAppliG();
+		}
 		
 		motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation:0 } ).ease (motion.easing.Elastic.easeOut);
 	}
 	
 	override public function dispose() 
 	{
-		super.dispose();
 		pause();
+		super.dispose();
+		controller.dispose();
+	}
+	
+	public function dead()
+	{
+		isPlayable = false;
+		isDead = true;
+		
+		_currentAnim = "dead";
+		_anim.gotoAndStop( _currentAnim );
 	}
 	
 	function pause()
 	{
-		playable = false;
+		isPlayable = false;
 		
 		_anim.scaleX = 1;
-		_anim.arrowScaleUI.scaleX = 1;
+		if ( _anim.arrowScaleUI != null )
+			_anim.arrowScaleUI.scaleX = 1;
 		
 		_currentAnim = "pause";
 		_anim.gotoAndStop( _currentAnim );
@@ -109,9 +147,12 @@ class Player extends Entity
 	
 	public override function upd( t:Float )
 	{
+		if ( isDead )
+			return;
+		
 		super.upd( t );
 		
-		if ( !playable )
+		if ( !isPlayable )
 			return;
 		
 		var contacts = Entity.getContacts( body );
@@ -122,11 +163,17 @@ class Player extends Entity
 		// DEAD!
 		if ( contacts.top && contacts.bottom )
 		{
-			trace("ecrasé");
+			if ( onDead != null )
+				onDead();
+			return;
+			//trace("ecrasé");
 		}
 		else if ( contacts.left && contacts.right )
 		{
-			trace("pressé");
+			if ( onDead != null )
+				onDead();
+			return;
+			//trace("pressé");
 		}
 		
 		
@@ -178,11 +225,17 @@ class Player extends Entity
 			{
 				dir = 1;
 				nextAnim = "run";
+				
+				if ( onMove != null )
+					onMove();
 			}
 			else if ( axisX < 0 )
 			{
 				dir = -1;
 				nextAnim = "run";
+				
+				if ( onMove != null )
+					onMove();
 			}
 		}
 		else
@@ -196,6 +249,9 @@ class Player extends Entity
 				dir = -1;
 			}
 			nextAnim = "jump";
+			
+			if ( onJump != null )
+				onJump();
 		}
 		
 		if ( dir != 0 && dir != Std.int( _anim.scaleX ) )

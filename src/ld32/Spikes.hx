@@ -31,6 +31,8 @@ class Spikes extends Entity
 			dir = 1;
 		}
 		
+		r = s * 0.5;
+		
 		body = new Body(BodyType.DYNAMIC);
 		body.userData.name = "spikes";
 		//box.allowRotation = false;

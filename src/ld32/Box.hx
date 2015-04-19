@@ -23,6 +23,8 @@ class Box extends Entity
 			s = 64;
 		}
 		
+		r = s * 0.5;
+		
 		body = new Body(BodyType.DYNAMIC);
 		body.userData.name = "box";
 		body.allowRotation = false;
