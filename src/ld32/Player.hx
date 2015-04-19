@@ -54,7 +54,7 @@ class Player extends Entity
 		
 		//playable = false;
 		
-		var shape = new Polygon(Polygon.rect( -24, -32, 48, 64));
+		var shape = new Polygon(Polygon.rect( -24, -0, 48, 32));
 		_mat = shape.material;
 		_mat.staticFriction = 0;
 		_mat.elasticity = 0;

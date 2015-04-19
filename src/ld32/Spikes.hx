@@ -18,18 +18,23 @@ class Spikes extends Entity
 		super();
 		
 		var s = 32;
-		var dir = 1;
+		var dir = (Math.random()>0.5) ? 1 : -1;
+		var v = 4;
 		
-		if ( Std.is( ui, Spikeball32LUI ) )
+		if ( Std.is( ui, Spikeball32UI ) )
 		{
 			s = 32;
-			dir = -1;
 		}
-		else if ( Std.is( ui, Spikeball32RUI ) )
+		else if ( Std.is( ui, Spikeball64UI ) )
+		{
+			s = 64;
+		}
+		else if ( Std.is( ui, Spikeball32SpeedUI ) )
 		{
 			s = 32;
-			dir = 1;
-		}
+			v *= 2;
+		} 
+		
 		
 		r = s * 0.5;
 		
@@ -38,7 +43,7 @@ class Spikes extends Entity
 		//box.allowRotation = false;
 		body.shapes.add(new Circle(s * 0.5));
 		body.position.setxy( ui.x, ui.y );
-		this.angularVel = body.angularVel = 4 * dir;
+		this.angularVel = body.angularVel = v * dir;
 		//box.space = SPACE;
 		
 		display = ui;//new SpykesUI();

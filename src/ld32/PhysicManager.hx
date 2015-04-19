@@ -36,27 +36,16 @@ class PhysicManager
 	public var currentGravity:Vec2;
 	public var space:Space;
 	
-	//var _objectiveState:Int;
-	
-	//var _bil:InteractionListener;
-	//var _eil:InteractionListener;
-	
-	var _enemies:Array<Entity>;
+	var _enemies:Array<Spikes>;
 	
 	var _w:Int;
 	var _h:Int;
 	
-	//var _controller:dl.input.Keyboard;
-	
 	function new() 
 	{
 		currentLevel = -1;
-		levelList = [ Level3, Level2, Level0, Level1 ];
+		levelList = [ Level0, Level1, Level2, Level3, Level4 ];
 		space = new Space();
-		
-		//_controller = new dl.input.Keyboard(0);
-		//_controller.addKeyListener( 8, null, restart );
-		
 	}
 	
 	public function restart()
@@ -65,7 +54,7 @@ class PhysicManager
 		start(currentLevel);
 	}
 	
-	public function changeG( newG:Vec2 )
+	public function changeG( newG:Vec2, time:Float = 2 )
 	{
 		space.gravity = newG;
 		currentGravity = newG;
@@ -73,26 +62,18 @@ class PhysicManager
 		var angle = newG.angle - Entity.HALF_PI;
 		space.bodies.foreach( function ( b:Body )
 		{
-			/*if ( b.type == BodyType.DYNAMIC )
-			{
-				b.rotation = angle;
-			}*/
 			if ( b.userData.name == "player" || b.userData.name == "box1" )
 			{
 				motion.Actuate.tween( b, 0.5, { rotation: modRotRad(b.rotation, -angle) } ).ease (motion.easing.Sine.easeInOut);
 			}
 		} );
 		
-		//Actuate
-		
-		//Game.main.rotation = -angle * 180 / Math.PI;
-		//motion.Actuate.tween (_playerMesh, 0.5, {z:0} ).ease (motion.easing.Sine.easeIn).onComplete ( function():Void { _playerControl.blockControls = false; _sound.playSound(); } );
 		var w = DisplayManager.i().world;
-		motion.Actuate.tween( w, 2, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( 0.25 );
+		motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 /*0.25*/ );
 		
 		#if debug
 			w = DisplayManager.i().debug;
-			motion.Actuate.tween( w, 2, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( 0.25 );
+			motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 /*0.25*/ );
 		#end
 	}
 	
@@ -133,7 +114,7 @@ class PhysicManager
 		_w = Math.round(level.wallsUI.width);
 		_h = Math.round(level.wallsUI.height);
 		
-		space.gravity = PhysicManager.gravityBottom;//new Vec2(0, 1200); // units are pixels/second/second
+		space.gravity = PhysicManager.gravityBottom;
 		
 		EntityManager.i().clearEntities();
 		
@@ -142,13 +123,7 @@ class PhysicManager
 		initGoal( level );
 		
 		
-		/*var ball = new Body(BodyType.DYNAMIC);
-		ball.shapes.add(new Circle(64));
-		ball.position.setxy(64, 0);
-		//ball.angularVel = 10;
-		ball.space = SPACE;*/
-		
-		changeG( gravityBottom );
+		changeG( gravityBottom, 0 );
 		
 		DisplayManager.i().addLevel(level);
 	}
@@ -181,30 +156,20 @@ class PhysicManager
 		EntityManager.i().player.removeListener();
 		EntityManager.i().player.onDead = dead;
 		
-		//_objectiveState = 0;
 		var t = motion.Actuate.tween( msg, 0.5, { scaleX:1, scaleY:1, alpha:1 } ).ease (motion.easing.Sine.easeOut).delay( 0.1 );
 		motion.Actuate.tween( msg, 0.5, { scaleX:0.5, scaleY:0.5, alpha:0 }, false )
 					.ease(motion.easing.Sine.easeOut).delay( 2 )
-					.onComplete( function() { /*if ( msg != null && msg.parent != null )*/ msg.visible = false; ObjectiveManager.i().validObjective(level); } );
+					.onComplete( function() { msg.visible = false; ObjectiveManager.i().validObjective(level); } );
 		
 		
 		
 		
 		
 		ObjectiveManager.i().onComplete = levelComplete;
-		
-		/*if ( Std.is( level, Level1 ) )
-		{
-			motion.Actuate.tween( msg, 1, { scaleX:0.5, scaleY:0.5, alpha:0 }, false )
-					.ease(motion.easing.Sine.easeOut).delay( 3 )
-					.onComplete( function() { if ( msg != null && msg.parent != null ) msg.parent.removeChild(msg); } );
-		}*/
-		
 	}
 	
 	function levelComplete()
 	{
-		//EntityManager.i().player.dead();
 		EntityManager.i().player.isPlayable = false;
 		_enemies = null;
 		
@@ -214,16 +179,12 @@ class PhysicManager
 		if ( ++currentLevel < levelList.length )
 		{
 			d = new WPUI();
-			//start( currentLevel );
 			Timer.delay( function() { start( currentLevel ); }, Math.round(t * 1000) );
 		}
 		else
 		{
 			d = new GOUI();
 			Timer.delay( function() { start( 0 ); }, Math.round(t * 1000) );
-			
-			//ObjectiveManager.i().onComplete = null;
-			//trace("game finish!");
 		}
 		
 		ObjectiveManager.i().onComplete = null;
@@ -249,7 +210,9 @@ class PhysicManager
 				ObjectiveManager.i().toCombine.rocks.push( s );
 				ObjectiveManager.i().toCombine.targetVel.push( b.body );
 			}
-			else if ( Std.is( s, Spikeball32LUI ) || Std.is( s, Spikeball32RUI ) )
+			else if ( 	Std.is( s, Spikeball32UI ) ||
+						Std.is( s, Spikeball64UI ) ||
+						Std.is( s, Spikeball32SpeedUI ) )
 			{
 				var sp = new Spikes( s );
 				_enemies.push( sp );
@@ -263,28 +226,6 @@ class PhysicManager
 				ObjectiveManager.i().toCombine.objective.push(s);
 			}
 		}
-		
-		// BOX 1
-		/*var box1 = new Body(BodyType.DYNAMIC);
-		box1.userData.name = "box1";
-		box1.allowRotation = false;
-		box1.shapes.add(new Polygon(Polygon.rect( -32, -32, 64, 64)));
-		box1.position.setxy(0, 32);
-		var entity = new Entity();
-		entity.display = new Box32UI();
-		entity.body = box1;
-		EntityManager.i().add( entity );*/
-        
-		
-		
-		
-		// SPIKES
-		/*for (i in 0...2)
-		{
-			var entity = new Spikes( i * 16, -(32 * i), 4 );
-			EntityManager.i().add( entity );
-        }*/
-		
 	}
 	
 	function initWorld( level:LevelUI )
@@ -320,28 +261,6 @@ class PhysicManager
 			floorBody.space = PhysicManager.i().space;
 		}
 		
-		/*var floorBody = new Body(BodyType.STATIC);
-		floorBody.shapes.add( new Polygon(Polygon.rect( 10-hw, hh-10, _w-20, 10)) );
-		floorBody.space = SPACE;
-		
-		floorBody = new Body(BodyType.STATIC);
-		floorBody.shapes.add( new Polygon(Polygon.rect(10-hw, -hh, _w-20, 10)) );
-		floorBody.space = SPACE;
-		
-		floorBody = new Body(BodyType.STATIC);
-		floorBody.shapes.add( new Polygon(Polygon.rect(0-hw, -hh+10, 10, _h-20)) );
-		floorBody.space = SPACE;
-		
-		floorBody = new Body(BodyType.STATIC);
-		floorBody.shapes.add( new Polygon(Polygon.rect(hw-20, -hh+10, 10, _h-20)) );
-		floorBody.space = SPACE;
-		
-		var t = 5*32;
-		
-		floorBody = new Body(BodyType.STATIC);
-		floorBody.shapes.add( new Polygon(Polygon.rect(-0.5*t, -hh, t, t)) );
-		floorBody.space = SPACE;*/
-		
 	}
 	
 	public function upd(t:Float)
@@ -353,6 +272,11 @@ class PhysicManager
 			var p = EntityManager.i().player;
 			for ( e in _enemies )
 			{
+				if ( e.body.angularVel * e.angularVel < 0 )
+				{
+					e.angularVel *= -1;
+				}
+				
 				if ( p.hitTest( e ) )
 					dead();
 			}

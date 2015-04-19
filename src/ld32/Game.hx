@@ -30,17 +30,17 @@ class Game extends Sprite
 	//var _player:Player;
 	
 	
-	public function new() 
+	public function new( w, h ) 
 	{
 		super();
 		
 		main = this;
 		
 		// SIZE
-		var w = 800;
-		var h = 800;
-		this.x = w / 2;
-		this.y = h / 2;
+		//var w = 900;
+		//var h = 900;
+		//this.x = w / 2;
+		//this.y = h / 2;
 		
 		
 		DisplayManager.i().init( w, h );
