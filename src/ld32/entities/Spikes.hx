@@ -1,5 +1,6 @@
-package ld32;
+package ld32.entities;
 import flash.display.DisplayObject;
+import ld32.entities.Entity;
 import nape.phys.Body;
 import nape.phys.BodyType;
 import nape.shape.Circle;
@@ -45,13 +46,11 @@ class Spikes extends Entity
 		
 		body = new Body(BodyType.DYNAMIC);
 		body.userData.name = "spikes";
-		//box.allowRotation = false;
 		body.shapes.add(new Circle(s * 0.5));
 		body.position.setxy( ui.x, ui.y );
 		this.angularVel = body.angularVel = v * dir;
-		//box.space = SPACE;
 		
-		display = ui;//new SpykesUI();
+		display = ui;
 	}
 	
 	override public function upd(t:Float) 

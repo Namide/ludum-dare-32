@@ -1,6 +1,9 @@
-package ld32;
+package ld32.entities;
 import dl.input.Keyboard;
 import flash.display.MovieClip;
+import ld32.entities.Entity;
+import ld32.manager.DisplayManager;
+import ld32.manager.PhysicManager;
 import nape.callbacks.InteractionCallback;
 import nape.callbacks.InteractionType;
 import nape.dynamics.Arbiter;
@@ -9,7 +12,6 @@ import nape.phys.Body;
 import nape.phys.BodyType;
 import nape.phys.Material;
 import nape.shape.Polygon;
-//import nape.space.Space;
 
 /**
  * ...
@@ -17,9 +19,7 @@ import nape.shape.Polygon;
  */
 class Player extends Entity
 {
-	//public var body:Body;
 	public var controller:Keyboard;
-	//public var napeDatas:NapeDatas;
 	public var isPlayable:Bool;
 	public var isDead:Bool;
 	
@@ -52,8 +52,6 @@ class Player extends Entity
 	{
 		super();
 		
-		//playable = false;
-		
 		var shape = new Polygon(Polygon.rect( -24, -0, 48, 32));
 		_mat = shape.material;
 		_mat.staticFriction = 0;
@@ -65,12 +63,8 @@ class Player extends Entity
 		body = new Body( BodyType.DYNAMIC );
 		body.shapes.add( shape );
 		body.position.setxy(-50, 0);
-		//body.space = space;
 		body.allowRotation = false;
 		body.userData.name = "player";
-		//body.userData.display = this;
-		//napeDatas = new NapeDatas();
-		//body.userData.napeDatas = napeDatas;
 		body.isBullet = true;
 		
 		display = _anim = new PlayerUI();
@@ -175,26 +169,7 @@ class Player extends Entity
 			if ( onDead != null )
 				onDead();
 			return;
-			//trace( body.crushFactor() );
 		}
-		/*if ( body.crushFactor() > 0 )
-		{
-			if ( onDead != null )
-				onDead();
-			return;
-		}*/
-		/*if ( contacts.top && contacts.bottom )
-		{
-			if ( onDead != null )
-				onDead();
-			return;
-		}
-		else if ( contacts.left && contacts.right )
-		{
-			if ( onDead != null )
-				onDead();
-			return;
-		}*/
 		
 		
 		// CONTROLS
@@ -292,21 +267,13 @@ class Player extends Entity
 		var cg = PhysicManager.i().currentGravity;
 		
 		if ( cg == PhysicManager.gravityBottom )
-		{
 			body.velocity.y = v;
-		}
 		else if ( cg == PhysicManager.gravityTop )
-		{
 			body.velocity.y = -v;
-		}
 		else if ( cg == PhysicManager.gravityLeft )
-		{
 			body.velocity.x = -v;
-		}
-		else // PhysicManager.gravityRight
-		{
+		else
 			body.velocity.x = v;
-		}
 	}
 	
 	public function updX( v:Float )
@@ -314,21 +281,13 @@ class Player extends Entity
 		var cg = PhysicManager.i().currentGravity;
 		
 		if ( cg == PhysicManager.gravityBottom )
-		{
 			body.velocity.x = v;
-		}
 		else if ( cg == PhysicManager.gravityTop )
-		{
 			body.velocity.x = -v;
-		}
 		else if ( cg == PhysicManager.gravityLeft )
-		{
 			body.velocity.y = v;
-		}
-		else // PhysicManager.gravityRight
-		{
+		else
 			body.velocity.y = -v;
-		}
 	}
 	
 }

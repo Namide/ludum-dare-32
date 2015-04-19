@@ -1,9 +1,16 @@
-package ld32;
+package ld32.manager;
 
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.Lib;
 import haxe.Timer;
+import ld32.entities.Box;
+import ld32.entities.End;
+import ld32.entities.Entity;
+import ld32.entities.Spikes;
+import ld32.manager.DisplayManager;
+import ld32.manager.EntityManager;
+import ld32.manager.ObjectiveManager;
 import nape.callbacks.CbEvent;
 import nape.callbacks.CbType;
 import nape.callbacks.InteractionCallback;
@@ -52,15 +59,8 @@ class PhysicManager
 		space = new Space();
 	}
 	
-	/*public function reboot()
-	{
-		//trace("restart");
-		start(0);
-	}*/
-	
 	public function restart()
 	{
-		//trace("restart");
 		start(currentLevel);
 	}
 	
@@ -79,13 +79,13 @@ class PhysicManager
 		} );
 		
 		var w = DisplayManager.i().world0;
-		motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 /*0.25*/ );
+		motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 );
 		w = DisplayManager.i().world1;
-		motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 /*0.25*/ );
+		motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 );
 		
 		#if debug
 			w = DisplayManager.i().debug;
-			motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 /*0.25*/ );
+			motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 );
 		#end
 	}
 	
@@ -178,9 +178,6 @@ class PhysicManager
 					.onComplete( function() { msg.visible = false; ObjectiveManager.i().validObjective(level); } );
 		
 		
-		
-		
-		
 		ObjectiveManager.i().onComplete = levelComplete;
 	}
 	
@@ -205,9 +202,7 @@ class PhysicManager
 			go.timeT.text += Std.string(Math.round( dt * 100 ) / 100) + " sec";
 			
 			currentLevel = 0;
-			/*d = new GOUI();*/
 			Lib.current.stage.addEventListener( MouseEvent.CLICK, clickRestart );
-			//Timer.delay( function() { start( 0 ); }, Math.round(t * 1000) );
 		}
 		
 		ObjectiveManager.i().onComplete = null;

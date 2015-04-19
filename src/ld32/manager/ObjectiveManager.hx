@@ -1,6 +1,7 @@
-package ld32;
+package ld32.manager;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
+import ld32.manager.EntityManager;
 import nape.geom.Vec2;
 
 typedef Combination = {
@@ -37,21 +38,9 @@ class ObjectiveManager
 	public function animText( frame:Int, time:Float = 0 )
 	{
 		var msg = EntityManager.i().message;
-		//msg.visible = true;
-		//msg.scaleX = msg.scaleY = 0.5;
-		//msg.alpha = 0;
 		msg.gotoAndStop( frame );
 		
-		/*var t = motion.Actuate.tween( msg, 0.5, { scaleX:1, scaleY:1, alpha:1 } ).ease (motion.easing.Sine.easeOut);
-		if ( time > 0 )
-		{
-			var t = motion.Actuate.tween( msg, 0.5, { scaleX:0.5, scaleY:0.5, alpha:0 }, false )
-					.ease(motion.easing.Sine.easeOut).delay( time )
-					.onComplete( function() { msg.visible = false; } );
-		}*/
 		animSprite( msg, time );
-		
-		//.onComplete( function() { if ( msg != null && msg.parent != null ) msg.parent.removeChild(msg); ObjectiveManager.i().validObjective(level); } );
 	}
 	
 	public function animSprite( s:Sprite, time:Float = 0 )
@@ -112,8 +101,7 @@ class ObjectiveManager
 	
 	public function upd(t:Float)
 	{
-		var maxD = 8.0; // 4 pixels
-		//var maxV = 1.0; // velocity
+		var maxD = 8.0;
 		
 		for ( v in toCombine.targetVel )
 		{
@@ -131,10 +119,6 @@ class ObjectiveManager
 			if ( dMin > maxD )
 				return;
 		}
-		
-		//if ( dist( c.target, c.objective ) > maxD )
-		//		return;
-		
 		
 		if ( onComplete != null )
 			onComplete();

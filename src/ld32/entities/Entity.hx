@@ -1,5 +1,6 @@
-package ld32;
+package ld32.entities;
 import flash.display.DisplayObject;
+import ld32.manager.PhysicManager;
 import nape.callbacks.CbEvent;
 import nape.callbacks.CbType;
 import nape.callbacks.InteractionCallback;
@@ -31,11 +32,6 @@ class Entity
 	public function new() 
 	{
 		inWorld = true;
-		//new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, CbType.ANY_BODY, CbType.ANY_BODY, handleBeginContact);
-		
-		/*_beginInteractionListener = new InteractionListener(CbEvent.BEGIN, InteractionType.ANY, CbType.ANY_BODY, CbType.ANY_BODY, onInteractionBegin);*/
-		/*_endInteractionListener = new InteractionListener(CbEvent.END, InteractionType.ANY, CbType.ANY_BODY, CbType.ANY_BODY, onInteractionEnd);*/
-		
 	}
 	
 	public function upd( t:Float )
@@ -84,14 +80,6 @@ class Entity
 			contacts.top = true;
 		else if ( r > (PI + QUART_PI) && r < PI + HALF_PI + QUART_PI )
 			contacts.right = true;
-		
-		//else if ( r > -(QUART_PI + HALF_PI) && r < -QUART_PI )
-		//	contacts.right = true;
-		
-		//if ( r < limit && r > -limit )
-		//	return true;
-		
-		//return false;
 	}
 	
 	public function dispose()

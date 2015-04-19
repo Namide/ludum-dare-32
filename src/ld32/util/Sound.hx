@@ -1,4 +1,4 @@
-package ld32;
+package ld32.util;
 import flash.media.SoundChannel;
 import flash.media.SoundTransform;
 import flash.net.URLRequest;

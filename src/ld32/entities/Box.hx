@@ -1,4 +1,4 @@
-package ld32;
+package ld32.entities;
 import flash.display.DisplayObject;
 import nape.phys.Body;
 import nape.phys.BodyType;
@@ -31,7 +31,7 @@ class Box extends Entity
 		body.shapes.add(new Polygon(Polygon.rect( -s * 0.5, -s * 0.5, s, s)));
 		body.position.setxy( ui.x, ui.y );
 		
-		display = ui;//new SpykesUI();
+		display = ui;
 	}
 	
 }

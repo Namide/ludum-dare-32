@@ -5,7 +5,7 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.Lib;
 import ld32.Game;
-import ld32.Sound;
+import ld32.util.Sound;
 
 /**
  * ...

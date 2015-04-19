@@ -1,5 +1,7 @@
-package ld32;
+package ld32.manager;
 import flash.display.MovieClip;
+import ld32.entities.Entity;
+import ld32.entities.Player;
 
 /**
  * ...
@@ -23,7 +25,6 @@ class EntityManager
 	{
 		player = new Player();
 		
-		//remove( player );
 		player.body.position.setxy( x, y );
 		DisplayManager.i().world1.addChild( player.display );
 		player.body.space = PhysicManager.i().space;

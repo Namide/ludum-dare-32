@@ -4,6 +4,11 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.display.StageDisplayState;
 import flash.Lib;
+import ld32.manager.DisplayManager;
+import ld32.manager.EntityManager;
+import ld32.manager.ObjectiveManager;
+import ld32.manager.PhysicManager;
+import ld32.util.Sound;
 
 #if debug
 	import nape.util.BitmapDebug;
@@ -23,14 +28,10 @@ class Game extends Sprite
 	var _music:Sound;
 	
 	var _entityManager:EntityManager;
-	//var _physicMg:PhysicManager;
 	
 	#if debug
 		public var debug:Debug;
 	#end
-	
-	//var _player:Player;
-	
 	
 	public function new( w, h ) 
 	{
@@ -38,13 +39,6 @@ class Game extends Sprite
 		
 		_music = new Sound();
 		main = this;
-		
-		// SIZE
-		//var w = 900;
-		//var h = 900;
-		//this.x = w / 2;
-		//this.y = h / 2;
-		
 		
 		DisplayManager.i().init( w, h );
 		
@@ -60,23 +54,17 @@ class Game extends Sprite
 		#end
 		
 		
-		//var level = new Level0();
 		PhysicManager.i().start( 0 );
 		
 		
 		// DISPLAY
 		addChild( DisplayManager.i() );
-		//DisplayManager.i().x = -w / 2;
-		//DisplayManager.i().y = -h / 2;
+		
 		
 		// REFRESH LISTENER
 		_timer = new Timer( Std.int(Lib.current.stage.frameRate) );
 		_timer.onDisplayUpdate = upd;
 		_timer.restart();
-		
-		
-		// ROTATION
-		//haxe.Timer.delay( changeG, 6000 );
 		
 		
 		// Bug if this listener is in PhysicManager ???
@@ -100,22 +88,6 @@ class Game extends Sprite
 			
 		} );
 	}
-	
-	/*public function changeG()
-	{
-		var r = Math.random();
-		if ( r < 0.25 )
-			PhysicManager.changeG( PhysicManager.gravityTop );
-		else if ( r < 0.5 )
-			PhysicManager.changeG( PhysicManager.gravityBottom );
-		else if ( r < 0.75 )
-			PhysicManager.changeG( PhysicManager.gravityLeft );
-		else
-			PhysicManager.changeG( PhysicManager.gravityRight );
-		
-		haxe.Timer.delay( changeG, 6000 );
-		
-	}*/
 	
 	function upd( t:Float )
 	{
