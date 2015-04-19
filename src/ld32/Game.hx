@@ -2,6 +2,7 @@ package ld32;
 import dl.utils.Timer;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
+import flash.display.StageDisplayState;
 import flash.Lib;
 
 #if debug
@@ -86,6 +87,16 @@ class Game extends Sprite
 				PhysicManager.i().start(0);
 			else if ( e.keyCode == 77 )
 				_music.playStopAll();
+			else if ( e.keyCode == 70 )
+			{
+				if ( flash.Lib.current.stage.displayState == StageDisplayState.NORMAL )
+				{
+					try {
+						flash.Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN;
+					}
+					catch (e:Dynamic) { }
+				}
+			}
 			
 		} );
 	}
