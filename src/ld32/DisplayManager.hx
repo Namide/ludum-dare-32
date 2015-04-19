@@ -17,9 +17,11 @@ class DisplayManager extends Sprite
 	public static var MAIN:DisplayManager;
 	public static function i() { return ( MAIN == null ) ? (MAIN = new DisplayManager()) : MAIN; }
 	
-	public var world:Sprite;
+	public var world0:Sprite;
+	public var world1:Sprite;
 	public var layer:Sprite;
 	public var overlay:Sprite;
+	public var direction:Sprite;
 	
 	#if debug
 		public var debug:Sprite;
@@ -38,10 +40,14 @@ class DisplayManager extends Sprite
 	{
 		this.w = w;
 		this.h = h;
-		world = new Sprite();
+		world0 = new Sprite();
+		world1 = new Sprite();
 		layer = new Sprite();
 		overlay = new OverlayUI();
-		addChild( world );
+		direction = new DirUI();
+		addChild( world0 );
+		addChild( world1 );
+		//addChild( direction );
 		addChild( layer );
 		addChild( overlay );
 		
@@ -72,16 +78,27 @@ class DisplayManager extends Sprite
 		bg.draw( b, m );
 		bg.draw( level.graphicUI );*/
 		
-		var graphic = level.graphicUI;
-		graphic.x = -level.wallsUI.width * 0.5;
-		graphic.y = -level.wallsUI.height * 0.5;
-		graphic.cacheAsBitmap = true;
+		var bg = level.bgUI;
+		bg.x = -768 * 0.5;
+		bg.y = -768 * 0.5;
+		bg.cacheAsBitmap = true;
+		
+		world0.addChildAt( direction, 0 );
+		world0.addChildAt( bg, 0 );
+		
+		
+		var layer = level.layerUI;
+		layer.x = -768 * 0.5;
+		layer.y = -768 * 0.5;
+		layer.cacheAsBitmap = true;
+		
+		world1.addChildAt( layer, 0 );
 		
 		/*var b = new Bitmap( bg, PixelSnapping.AUTO, true );
 		b.x = -w * 0.5;
 		b.y = -h * 0.5;*/
 		
-		world.addChildAt( graphic, 0 );
+		
 	}
 	
 }

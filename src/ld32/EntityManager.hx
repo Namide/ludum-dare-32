@@ -25,7 +25,7 @@ class EntityManager
 		
 		//remove( player );
 		player.body.position.setxy( x, y );
-		DisplayManager.i().world.addChild( player.display );
+		DisplayManager.i().world1.addChild( player.display );
 		player.body.space = PhysicManager.i().space;
 		add( player );
 	}
@@ -37,7 +37,7 @@ class EntityManager
 		if ( e.body != null )
 			e.body.space = PhysicManager.i().space;
 		
-		DisplayManager.i().world.addChildAt( e.display, (over)?DisplayManager.i().world.numChildren:0 );
+		DisplayManager.i().world1.addChildAt( e.display, (over)?DisplayManager.i().world1.numChildren:0 );
 	}
 	
 	public function remove(e:Entity)
@@ -62,8 +62,11 @@ class EntityManager
 		
 		var dm = DisplayManager.i();
 			
-		while ( dm.world.numChildren > 0 )
-			dm.world.removeChildAt( 0 );
+		while ( dm.world0.numChildren > 0 )
+			dm.world0.removeChildAt( 0 );
+		
+		while ( dm.world1.numChildren > 0 )
+			dm.world1.removeChildAt( 0 );
 		
 		while ( dm.layer.numChildren > 0 )
 			dm.layer.removeChildAt( 0 );

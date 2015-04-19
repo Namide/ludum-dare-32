@@ -78,7 +78,9 @@ class PhysicManager
 			}
 		} );
 		
-		var w = DisplayManager.i().world;
+		var w = DisplayManager.i().world0;
+		motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 /*0.25*/ );
+		w = DisplayManager.i().world1;
 		motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 /*0.25*/ );
 		
 		#if debug

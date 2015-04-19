@@ -19,6 +19,7 @@ class Game extends Sprite
 	public static var main:Game;
 
 	var _timer:Timer;
+	var _music:Sound;
 	
 	var _entityManager:EntityManager;
 	//var _physicMg:PhysicManager;
@@ -34,6 +35,7 @@ class Game extends Sprite
 	{
 		super();
 		
+		_music = new Sound();
 		main = this;
 		
 		// SIZE
@@ -80,8 +82,11 @@ class Game extends Sprite
 		flash.Lib.current.stage.addEventListener( flash.events.KeyboardEvent.KEY_UP, function(e:flash.events.KeyboardEvent) {
 			if ( e.keyCode == 8 )
 				PhysicManager.i().restart();
-			if ( e.keyCode == 27 )
+			else if ( e.keyCode == 27 )
 				PhysicManager.i().start(0);
+			else if ( e.keyCode == 77 )
+				_music.playStopAll();
+			
 		} );
 	}
 	
