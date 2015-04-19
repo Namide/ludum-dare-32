@@ -20,7 +20,7 @@ class PhysicManager
 	static var MAIN:PhysicManager;
 	public static function i() { return (MAIN == null) ? (MAIN = new PhysicManager()) : MAIN; }
 	
-	public static inline var G_FORCE = 1500.0;
+	public static inline var G_FORCE = 3000.0;
 	
 	public static var gravityBottom = new Vec2(0, PhysicManager.G_FORCE);
 	public static var gravityLeft = new Vec2(-PhysicManager.G_FORCE, 0);
@@ -38,23 +38,23 @@ class PhysicManager
 	
 	function new() 
 	{
+		space = new Space();
 	}
 	
-	public static function changeG( newG:Vec2 )
+	public function changeG( newG:Vec2 )
 	{
-		i().space.gravity = newG;
-		i().currentGravity = newG;
+		space.gravity = newG;
+		currentGravity = newG;
 		
-		var angle = newG.angle - Math.PI * 0.5;
-		i().space.bodies.foreach( function ( b:Body )
+		var angle = newG.angle - Entity.HALF_PI;
+		space.bodies.foreach( function ( b:Body )
 		{
 			/*if ( b.type == BodyType.DYNAMIC )
 			{
 				b.rotation = angle;
 			}*/
-			if ( b.userData.name == "player" )
+			if ( b.userData.name == "player" || b.userData.name == "box1" )
 			{
-				//b.rotation = angle;
 				motion.Actuate.tween( b, 0.5, { rotation: modRotRad(b.rotation, -angle) } ).ease (motion.easing.Sine.easeInOut);
 			}
 		} );
@@ -139,26 +139,12 @@ class PhysicManager
 		_w = Math.round(level.wallsUI.width);
 		_h = Math.round(level.wallsUI.height);
 		
-		var gravity:Vec2 = PhysicManager.gravityBottom;//new Vec2(0, 1200); // units are pixels/second/second
-		space = new Space(gravity);
+		space.gravity = PhysicManager.gravityBottom;//new Vec2(0, 1200); // units are pixels/second/second
+		
+		EntityManager.i().clearEntities();
 		
 		initWorld( level );
-		
-		for (i in 0...16)
-		{
-			var box = new Body(BodyType.DYNAMIC);
-			box.userData.name = "box";
-			box.allowRotation = false;
-			box.shapes.add(new Polygon(Polygon.rect( -16, -16, 32, 32)));
-			box.position.setxy(0, -(32 * i));
-			//box.space = SPACE;
-			
-			var entity = new Entity();
-			entity.display = new BoxUI();
-			entity.body = box;
-			
-			EntityManager.i().add( entity );
-        }
+		initItems( level );
 		
 		
 		/*var ball = new Body(BodyType.DYNAMIC);
@@ -170,6 +156,46 @@ class PhysicManager
 		changeG( gravityBottom );
 	}
 	
+	function initItems( level:Level1 )
+	{
+		
+		var i = level.itemsUI.numChildren;
+		while ( --i > -1 )
+		{
+			var s = level.itemsUI.getChildAt(i);
+			s.x -= _w * 0.5;
+			s.y -= _h * 0.5;
+			
+			if ( Std.is( s, Box32UI ) || Std.is( s, Box64UI ) )
+				EntityManager.i().add( new Box( s ) );
+			else if ( Std.is( s, Spikeball32LUI ) || Std.is( s, Spikeball32RUI ) )
+				EntityManager.i().add( new Spikes( s ) );
+			else if ( Std.is( s, SpawnUI ) )
+				EntityManager.i().playerStart(s.x, s.y);
+		}
+		
+		// BOX 1
+		/*var box1 = new Body(BodyType.DYNAMIC);
+		box1.userData.name = "box1";
+		box1.allowRotation = false;
+		box1.shapes.add(new Polygon(Polygon.rect( -32, -32, 64, 64)));
+		box1.position.setxy(0, 32);
+		var entity = new Entity();
+		entity.display = new Box32UI();
+		entity.body = box1;
+		EntityManager.i().add( entity );*/
+        
+		
+		
+		
+		// SPIKES
+		/*for (i in 0...2)
+		{
+			var entity = new Spikes( i * 16, -(32 * i), 4 );
+			EntityManager.i().add( entity );
+        }*/
+		
+	}
 	
 	function initWorld( level:Level1 )
 	{

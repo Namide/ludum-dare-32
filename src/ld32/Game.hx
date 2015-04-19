@@ -22,7 +22,7 @@ class Game extends Sprite
 	//var _physicMg:PhysicManager;
 	var _debug:Debug;
 	
-	var _player:Player;
+	//var _player:Player;
 	
 	
 	public function new() 
@@ -33,10 +33,6 @@ class Game extends Sprite
 		
 		var level = new Level1();
 		PhysicManager.i().init( level );
-		
-		_player = new Player( PhysicManager.i().space );
-		EntityManager.i().add( _player );
-		
 		DisplayManager.i().addLevel(level);
 		
 		// SIZE
@@ -57,7 +53,7 @@ class Game extends Sprite
 		_debug.transform.ty = h / 2;
 		_debug.display.x = -w / 2;
 		_debug.display.y = -h / 2;
-        //addChild(_debug.display);
+        addChild(_debug.display);
 		
 		
 		// REFRESH LISTENER
@@ -67,10 +63,10 @@ class Game extends Sprite
 		
 		
 		// ROTATION
-		haxe.Timer.delay( changeG, 6000 );
+		//haxe.Timer.delay( changeG, 6000 );
 	}
 	
-	public function changeG()
+	/*public function changeG()
 	{
 		var r = Math.random();
 		if ( r < 0.25 )
@@ -84,7 +80,7 @@ class Game extends Sprite
 		
 		haxe.Timer.delay( changeG, 6000 );
 		
-	}
+	}*/
 	
 	function upd( t:Float )
 	{

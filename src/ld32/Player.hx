@@ -4,11 +4,12 @@ import flash.display.MovieClip;
 import nape.callbacks.InteractionCallback;
 import nape.callbacks.InteractionType;
 import nape.dynamics.Arbiter;
+import nape.geom.Vec2;
 import nape.phys.Body;
 import nape.phys.BodyType;
 import nape.phys.Material;
 import nape.shape.Polygon;
-import nape.space.Space;
+//import nape.space.Space;
 
 /**
  * ...
@@ -21,14 +22,16 @@ class Player extends Entity
 	public var napeDatas:NapeDatas;
 	
 	var _mat:Material;
-	var _anim:MovieClip;
+	var _anim:PlayerUI;
 	var _currentAnim:String;
 	
 	public var velX = 700;
-	public var velJump = 600;
+	public var velJump = 1000;
 	public var velXJump = 300;
 	
-	public function new( space:Space ) 
+	public var dir:Vec2;
+	
+	public function new() 
 	{
 		super();
 		
@@ -41,7 +44,7 @@ class Player extends Entity
 		body = new Body( BodyType.DYNAMIC );
 		body.shapes.add( shape );
 		body.position.setxy(-50, 0);
-		body.space = space;
+		//body.space = space;
 		body.allowRotation = false;
 		body.userData.name = "player";
 		body.userData.display = this;
@@ -50,7 +53,36 @@ class Player extends Entity
 		
 		display = _anim = new PlayerUI();
 		
-		controller = new Keyboard( 0 );
+		controller = new Keyboard( 0.08 );
+		
+		dir = PhysicManager.gravityBottom;
+		
+		controller.addKeyListener( Keys.keyBottom, null, changeDir );
+		controller.addKeyListener( Keys.keyB1, null, moveToDir );
+	}
+	
+	function changeDir()
+	{
+		if ( dir == PhysicManager.gravityBottom )
+			dir = PhysicManager.gravityRight;
+		else if ( dir == PhysicManager.gravityRight )
+			dir = PhysicManager.gravityTop;
+		else if ( dir == PhysicManager.gravityTop )
+			dir = PhysicManager.gravityLeft;
+		else
+			dir = PhysicManager.gravityBottom;
+		
+		//var angle = _anim.rotation - ( (dir.angle - PhysicManager.i().currentGravity.angle) - Entity.HALF_PI) * Entity.RAD_TO_DEGREES;
+		var angle = (PhysicManager.i().currentGravity.angle - dir.angle) * Entity.RAD_TO_DEGREES;
+		motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation: PhysicManager.modRotDegrees( _anim.arrowScaleUI.arrowRotUI.rotation, angle ) } ).ease(motion.easing.Elastic.easeOut);
+	}
+	
+	function moveToDir()
+	{
+		if ( dir != PhysicManager.i().currentGravity )
+			PhysicManager.i().changeG( dir );
+		
+		motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation:0 } ).ease (motion.easing.Elastic.easeOut);
 	}
 	
 	public override function upd( t:Float )
@@ -140,15 +172,16 @@ class Player extends Entity
 		}
 		
 		if ( dir != 0 && dir != Std.int( _anim.scaleX ) )
+		{
 			_anim.scaleX = dir;
+			_anim.arrowScaleUI.scaleX = dir;
+		}
 		
 		if ( nextAnim != _currentAnim )
 		{
 			_currentAnim = nextAnim;
 			_anim.gotoAndStop( nextAnim );
 		}
-		
-		
 		
 		
 		super.upd( t );

@@ -50,14 +50,8 @@ class Entity
 		var contacts = { left:false, right:false, bottom:false, top:false };
 		
 		if ( body.arbiters.length > 0 )
-		{
-			var on = false;
-			
 			for ( a in body.arbiters )
-			{
 				isOver( a, contacts );
-			}
-		}
 		
 		return contacts;
 	}
@@ -75,7 +69,6 @@ class Entity
 			r += DOUBLE_PI;
 		r %= DOUBLE_PI;
 		
-		
 		if ( r > -QUART_PI && r < QUART_PI )
 			contacts.bottom = true;
 		else if ( r > QUART_PI && r < QUART_PI + HALF_PI )
@@ -92,6 +85,15 @@ class Entity
 		//	return true;
 		
 		//return false;
+	}
+	
+	public function dispose()
+	{
+		if ( body != null && body.space != null )
+			body.space = null;
+		
+		if ( display != null && display.parent != null )
+			display.parent.removeChild( display );
 	}
 	
 	/*public static function isOnGround( body:Interactor, ic:InteractionCallback)
