@@ -87,18 +87,23 @@ class Player extends Entity
 			dir = PhysicManager.gravityLeft;
 		else
 			dir = PhysicManager.gravityBottom;
-		
+			
 		if ( onChangeG != null )
 			onChangeG();
-		
+			
+		refreshArrow();
+	}
+	
+	public function refreshArrow( time:Float = 0.5 )
+	{	
 		var angle = (PhysicManager.i().currentGravity.angle - dir.angle) * Entity.RAD_TO_DEGREES;
 		var angle2 = (PhysicManager.gravityBottom.angle - dir.angle) * Entity.RAD_TO_DEGREES;
 		
 		if ( DisplayManager.i().direction != null )
-			motion.Actuate.tween( DisplayManager.i().direction, 0.5, { rotation: PhysicManager.modRotDegrees( DisplayManager.i().direction.rotation, angle2 ) } ).ease(motion.easing.Elastic.easeOut);
+			motion.Actuate.tween( DisplayManager.i().direction, time, { rotation: PhysicManager.modRotDegrees( DisplayManager.i().direction.rotation, angle2 ) } ).ease(motion.easing.Elastic.easeOut);
 
 		if ( _anim != null && _anim.arrowScaleUI != null && _anim.arrowScaleUI.arrowRotUI != null )
-			motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, 0.5, { rotation: PhysicManager.modRotDegrees( _anim.arrowScaleUI.arrowRotUI.rotation, angle ) } ).ease(motion.easing.Elastic.easeOut);
+			motion.Actuate.tween( _anim.arrowScaleUI.arrowRotUI, time, { rotation: PhysicManager.modRotDegrees( _anim.arrowScaleUI.arrowRotUI.rotation, angle ) } ).ease(motion.easing.Elastic.easeOut);
 	}
 	
 	function moveToDir()

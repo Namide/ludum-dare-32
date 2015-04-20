@@ -83,6 +83,8 @@ class PhysicManager
 		w = DisplayManager.i().world1;
 		motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 );
 		
+		EntityManager.i().player.refreshArrow(0);
+		
 		#if debug
 			w = DisplayManager.i().debug;
 			motion.Actuate.tween( w, time, { rotation: modRotDegrees(w.rotation, angle * Entity.RAD_TO_DEGREES ) } ).ease (motion.easing.Sine.easeInOut).delay( time / 8 );
